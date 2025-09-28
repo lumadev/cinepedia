@@ -21,13 +21,7 @@ You can **add movies**, **view details**, **edit information**, and **organize y
 
 ### 2. Install dependencies 
 
-npm install
-# or
-yarn install
-# or
 pnpm install
-# or
-bun install1
 
 ### 3. Run the development server
 
@@ -40,3 +34,11 @@ Once the server is running, open your browser at:
 👉 http://localhost:3000
 
 The application will be available on port 3000 by default.
+
+🛠️ Tech Stack
+
+**Next.js** - React framework for production
+**TypeScript** - Type-safe development
+**Tailwind CSS** - Utility-first CSS framework
+**DaisyUI** -  UI components
+**Firebase** – Database & authentication
