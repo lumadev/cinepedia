@@ -37,8 +37,8 @@ The application will be available on port 3000 by default.
 
 🛠️ Tech Stack
 
-**Next.js** - React framework for production
-**TypeScript** - Type-safe development
-**Tailwind CSS** - Utility-first CSS framework
-**DaisyUI** -  UI components
-**Firebase** – Database & authentication
+**Next.js** - React framework for production<br/>
+**TypeScript** - Type-safe development<br/>
+**Tailwind CSS** - Utility-first CSS framework<br/>
+**DaisyUI** -  UI components<br/>
+**Firebase** – Database & authentication<br/>
