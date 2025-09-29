@@ -1,12 +1,4 @@
-export interface Movie {
-  id: number;
-  title: string;
-  year: number;
-  poster: string;        // URL da imagem
-  genre?: string[];      // opcional: gêneros do filme
-  rating?: number;       // opcional: nota do filme
-  description?: string;  // opcional: sinopse
-}
+import { Movie } from "@/components/movies/movie";
 
 type MovieListProps = {
   movies: Movie[];
