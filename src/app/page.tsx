@@ -3,57 +3,17 @@
 import { useState, useEffect } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
+import { Movie } from "@/components/movies/movie";
+import { Button } from "@/components/ui/Button";
+import { Toast } from "@/components/ui/Toast";
 
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-export interface Movie {
-  id: number;
-  title: string;
-  year: number;
-  poster: string; 
-  genre?: string[];
-  rating?: number;
-  description?: string; 
-}
-
-// const mockMovies: Movie[] = [
-//   {
-//     id: 1,
-//     title: "O Poderoso Chefão",
-//     year: 1972,
-//     poster: "/posters/godfather.jpg",
-//     genre: ["Crime", "Drama"],
-//     rating: 9.2,
-//     description: "A história da família mafiosa Corleone."
-//   },
-//   {
-//     id: 2,
-//     title: "Star Wars: Episódio IV - Uma Nova Esperança",
-//     year: 1977,
-//     poster: "/posters/starwars.jpg",
-//     genre: ["Ficção Científica", "Aventura"],
-//     rating: 8.6,
-//     description: "Um jovem herói luta contra o Império Galáctico."
-//   },
-//   {
-//     id: 3,
-//     title: "Titanic",
-//     year: 1997,
-//     poster: "/posters/titanic.jpg",
-//     genre: ["Romance", "Drama"],
-//     rating: 7.8,
-//     description: "Romance a bordo do trágico navio Titanic."
-//   },
-// ];
-
-async function fetchMovies() {
-  
-}
-
 export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadMovies = async () => {
@@ -66,8 +26,7 @@ export default function Home() {
 
         setMovies(moviesDatabase);
       } catch(e) {
-        console.log('erro', e)
-        return []
+        setToastMessage("Ocorreu um erro ao carregar os filmes.");
       }
     };
 
@@ -86,12 +45,12 @@ export default function Home() {
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Lista de Filmes</h1>
-        <button
-          className="btn btn-primary"
+        <Button
+          variant="primary"
           onClick={() => setShowModal(true)}
         >
           Adicionar Filme
-        </button>
+        </Button>
       </div>
 
       <MovieList movies={movies} />
@@ -101,6 +60,15 @@ export default function Home() {
         onClose={() => setShowModal(false)}
         onAfterSave={onAfterSave}
       />
+
+      {/* Toast container */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type="error"
+          onClose={() => setToastMessage(null)}
+        />
+      )}
     </div>
   );
 }
