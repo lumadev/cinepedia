@@ -3,35 +3,42 @@
 import { useState } from "react";
 import type { Movie } from "@/app/page";
 
+import { db } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
+
 interface AddMovieModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (movie: Omit<Movie, "id">) => void;
+  onAfterSave: (movie: Omit<Movie, "id">) => void;
 }
 
-export function AddMovieModal({ isOpen, onClose, onSave }: AddMovieModalProps) {
+export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalProps) {
   const [newMovie, setNewMovie] = useState<Omit<Movie, "id">>({
     title: "",
     year: new Date().getFullYear(),
     poster: "",
     genre: [],
-    rating: undefined,
+    rating: null,
     description: "",
   });
 
-  const handleSave = () => {
-    onSave(newMovie);
+  const handleSave = async () => {
+    try {
+      const teste = await addDoc(collection(db, "movies"), newMovie);
 
-    // resetar estado
-    setNewMovie({
-      title: "",
-      year: new Date().getFullYear(),
-      poster: "",
-      genre: [],
-      rating: undefined,
-      description: "",
-    });
-    onClose();
+      onAfterSave(newMovie);
+      setNewMovie({
+        title: "",
+        year: new Date().getFullYear(),
+        poster: "",
+        genre: [],
+        rating: null,
+        description: "",
+      });
+      onClose();
+    } catch(e) {
+      console.log(e)
+    }
   };
 
   if (!isOpen) return null;

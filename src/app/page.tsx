@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
+
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export interface Movie {
   id: number;
@@ -14,41 +17,64 @@ export interface Movie {
   description?: string; 
 }
 
-const mockMovies: Movie[] = [
-  {
-    id: 1,
-    title: "O Poderoso Chefão",
-    year: 1972,
-    poster: "/posters/godfather.jpg",
-    genre: ["Crime", "Drama"],
-    rating: 9.2,
-    description: "A história da família mafiosa Corleone."
-  },
-  {
-    id: 2,
-    title: "Star Wars: Episódio IV - Uma Nova Esperança",
-    year: 1977,
-    poster: "/posters/starwars.jpg",
-    genre: ["Ficção Científica", "Aventura"],
-    rating: 8.6,
-    description: "Um jovem herói luta contra o Império Galáctico."
-  },
-  {
-    id: 3,
-    title: "Titanic",
-    year: 1997,
-    poster: "/posters/titanic.jpg",
-    genre: ["Romance", "Drama"],
-    rating: 7.8,
-    description: "Romance a bordo do trágico navio Titanic."
-  },
-];
+// const mockMovies: Movie[] = [
+//   {
+//     id: 1,
+//     title: "O Poderoso Chefão",
+//     year: 1972,
+//     poster: "/posters/godfather.jpg",
+//     genre: ["Crime", "Drama"],
+//     rating: 9.2,
+//     description: "A história da família mafiosa Corleone."
+//   },
+//   {
+//     id: 2,
+//     title: "Star Wars: Episódio IV - Uma Nova Esperança",
+//     year: 1977,
+//     poster: "/posters/starwars.jpg",
+//     genre: ["Ficção Científica", "Aventura"],
+//     rating: 8.6,
+//     description: "Um jovem herói luta contra o Império Galáctico."
+//   },
+//   {
+//     id: 3,
+//     title: "Titanic",
+//     year: 1997,
+//     poster: "/posters/titanic.jpg",
+//     genre: ["Romance", "Drama"],
+//     rating: 7.8,
+//     description: "Romance a bordo do trágico navio Titanic."
+//   },
+// ];
+
+async function fetchMovies() {
+  
+}
 
 export default function Home() {
-  const [movies, setMovies] = useState<Movie[]>(mockMovies);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [showModal, setShowModal] = useState(false);
 
-  const handleAddMovie = (newMovie: Omit<Movie, "id">) => {
+  useEffect(() => {
+    const loadMovies = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "movies"));
+        const moviesDatabase = snapshot.docs.map(doc => ({ 
+          id: Number(doc.id), 
+          ...doc.data() 
+        })) as Movie[];
+
+        setMovies(moviesDatabase);
+      } catch(e) {
+        console.log('erro', e)
+        return []
+      }
+    };
+
+    loadMovies();
+  }, []);
+
+  const onAfterSave = (newMovie: Omit<Movie, "id">) => {
     const movie: Movie = {
       id: movies.length + 1,
       ...newMovie,
@@ -73,7 +99,7 @@ export default function Home() {
       <AddMovieModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onSave={handleAddMovie}
+        onAfterSave={onAfterSave}
       />
     </div>
   );
