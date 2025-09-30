@@ -13,7 +13,7 @@ import { db } from "@/lib/firebase";
 export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadMovies = async () => {
@@ -26,7 +26,7 @@ export default function Home() {
 
         setMovies(moviesDatabase);
       } catch(e) {
-        setToastMessage("Ocorreu um erro ao carregar os filmes.");
+        setErrorMessage("Ocorreu um erro ao carregar os filmes.");
       }
     };
 
@@ -61,11 +61,11 @@ export default function Home() {
         onAfterSave={onAfterSave}
       />
 
-      {toastMessage && (
+      {errorMessage && (
         <Toast
-          message={toastMessage}
+          message={errorMessage}
           type="error"
-          onClose={() => setToastMessage(null)}
+          onClose={() => setErrorMessage(null)}
         />
       )}
     </div>
