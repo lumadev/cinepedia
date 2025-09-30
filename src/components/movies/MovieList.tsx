@@ -6,18 +6,26 @@ type MovieListProps = {
 
 export const MovieList = ({ movies }: MovieListProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
       {movies.map((movie) => (
-        <div key={movie.id} className="card bg-base-100 shadow-xl">
+        <div
+          key={movie.id}
+          className="card shadow-lg"
+          style={{
+            backgroundColor: "var(--background)",
+            color: "var(--foreground)",
+          }}
+        >
           <figure>
-            <img src={movie.poster} alt={movie.title} className="h-72 w-full object-cover" />
+            <img
+              src={movie.poster}
+              alt={movie.title}
+              className="h-48 w-full object-cover rounded-t-md"
+            />
           </figure>
-          <div className="card-body">
-            <h2 className="card-title">{movie.title}</h2>
-            <p>{movie.year}</p>
-            {/* <div className="card-actions justify-end">
-              <button className="btn btn-primary btn-sm">Ver detalhes</button>
-            </div> */}
+          <div className="card-body p-3">
+            <h2 className="card-title text-sm">{movie.title}</h2>
+            <p className="text-xs">{movie.year}</p>
           </div>
         </div>
       ))}

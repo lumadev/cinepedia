@@ -42,7 +42,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen p-6 bg-[var(--background)] text-[var(--foreground)] transition-colors">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Lista de Filmes</h1>
         <Button
@@ -61,7 +61,6 @@ export default function Home() {
         onAfterSave={onAfterSave}
       />
 
-      {/* Toast container */}
       {toastMessage && (
         <Toast
           message={toastMessage}
