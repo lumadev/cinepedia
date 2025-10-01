@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import type { Movie } from "@/components/movies/movie";
-
+import { useToast } from "@/components/ui/ToastContext";
 import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
+
+import type { Movie } from "@/components/movies/movie";
 
 interface AddMovieModalProps {
   isOpen: boolean;
@@ -13,13 +14,15 @@ interface AddMovieModalProps {
 }
 
 export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalProps) {
+  const { showError } = useToast();
+
   const [newMovie, setNewMovie] = useState<Omit<Movie, "id">>({
     title: "",
-    year: new Date().getFullYear(),
     poster: "",
-    genre: [],
+    genres: [],
     rating: null,
     description: "",
+    dateSeen: ""
   });
 
   const handleSave = async () => {
@@ -28,15 +31,15 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
       onAfterSave(newMovie);
       setNewMovie({
         title: "",
-        year: new Date().getFullYear(),
         poster: "",
-        genre: [],
+        genres: [],
         rating: null,
         description: "",
+        dateSeen: ""
       });
       onClose();
     } catch (e) {
-      console.log(e);
+      showError("Ocorreu um erro ao salvar o filme");
     }
   };
 
@@ -86,6 +89,23 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
             value={newMovie.description}
             onChange={(e) =>
               setNewMovie({ ...newMovie, description: e.target.value })
+            }
+          />
+          <label
+            htmlFor="dateSeen"
+            className="label text-gray-300"
+          >
+            <span className="label-text text-gray-300">
+              Data que eu vi o filme
+            </span>
+          </label>
+          <input
+            id="dateSeen"
+            type="date"
+            className="input input-bordered w-full bg-gray-800 text-gray-100 border-gray-600 placeholder-gray-400"
+            value={newMovie.dateSeen}
+            onChange={(e) =>
+              setNewMovie({ ...newMovie, dateSeen: e.target.value })
             }
           />
         </div>

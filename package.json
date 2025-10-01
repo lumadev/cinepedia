@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "start": "start http://localhost:3000",
     "build": "next build --turbopack",
-    "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
