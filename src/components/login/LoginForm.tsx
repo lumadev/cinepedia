@@ -8,13 +8,11 @@ import { useToast } from "@/components/ui/ToastContext";
 
 import { LoginInput } from "./LoginInput";
 
-
 export const LoginForm = () => {
   const { showError } = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +29,9 @@ export const LoginForm = () => {
   return (
     <div className="card w-full max-w-sm bg-base-200 shadow-xl relative">
       <div className="card-body">
-        <h2 className="text-2xl font-bold text-center">🎬 Sistema de Filmes</h2>
+        <h2 className="text-2xl font-bold text-center">
+          🎬 Sistema de Filmes
+        </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <LoginInput
             type="email"
