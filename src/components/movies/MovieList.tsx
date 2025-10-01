@@ -25,7 +25,9 @@ export const MovieList = ({ movies }: MovieListProps) => {
           </figure>
           <div className="card-body p-3">
             <h2 className="card-title text-sm">{movie.title}</h2>
-            <p className="text-xs">{movie.year}</p>
+            <p className="text-xs text-gray-400">
+              {movie.genres?.join(", ")}
+            </p>
           </div>
         </div>
       ))}
