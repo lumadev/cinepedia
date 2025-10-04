@@ -20,7 +20,7 @@ export const MovieList = ({ movies }: MovieListProps) => {
             <img
               src={movie.poster}
               alt={movie.title}
-              className="h-48 w-full object-cover rounded-t-md"
+              className="h-88 w-full object-cover rounded-t-md"
             />
           </figure>
           <div className="card-body p-3">
