@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/ToastContext";
 import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 import type { Movie } from "@/components/movies/movie";
 
@@ -98,24 +99,23 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
         </div>
 
         <div className="modal-action flex gap-2">
-          <button
-            className="btn btn-ghost text-gray-300 border-gray-600 
-             transition-colors duration-500 
-             hover:text-gray-400 hover:border-gray-500"           
-            onClick={onClose}
+          <Button 
+            variant="ghost" 
+            onClick={onClose} 
+            disabled={loadingSave} 
             aria-label="Cancelar"
-            disabled={loadingSave}
           >
             Cancelar
-          </button>
-          <button
-            className="btn btn-primary bg-blue-600 border-blue-600 hover:bg-blue-700 disabled:opacity-50"
-            onClick={handleSave}
+          </Button>
+
+          <Button
+            variant="primary"
+            onClick={() => handleSave}
             disabled={loadingSave}
             aria-label="Salvar filme"
           >
             {loadingSave ? "Salvando..." : "Salvar"}
-          </button>
+          </Button>
         </div>
       </div>
     </dialog>
