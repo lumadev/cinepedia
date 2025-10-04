@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/ToastContext";
 import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { Input } from "@/components/ui/Input";
 
 import type { Movie } from "@/components/movies/movie";
 
@@ -63,26 +64,18 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
         <h3 className="font-bold text-lg">Novo Filme</h3>
 
         <div className="space-y-3 mt-4">
-          <input
-            type="text"
+          <Input
             placeholder="Título"
             aria-label="Título do filme"
-            className={`input input-bordered ${inputBase}`}
             value={newMovie.title}
-            onChange={(e) =>
-              setNewMovie({ ...newMovie, title: e.target.value })
-            }
+            onChange={(e) => setNewMovie({ ...newMovie, title: e.target.value })}
           />
 
-          <input
-            type="text"
+          <Input
             placeholder="URL do Poster"
             aria-label="Poster do filme"
-            className={`input input-bordered ${inputBase}`}
             value={newMovie.poster}
-            onChange={(e) =>
-              setNewMovie({ ...newMovie, poster: e.target.value })
-            }
+            onChange={(e) => setNewMovie({ ...newMovie, poster: e.target.value })}
           />
 
           <textarea
@@ -95,26 +88,20 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
             }
           />
 
-          <label htmlFor="dateSeen" className="label text-gray-300">
-            <span className="label-text text-gray-300">
-              Data que eu vi o filme
-            </span>
-          </label>
-          <input
-            id="dateSeen"
+          <Input
             type="date"
             aria-label="Data em que o filme foi visto"
-            className={`input input-bordered ${inputBase}`}
+            label="Data que eu vi o filme"
             value={newMovie.dateSeen}
-            onChange={(e) =>
-              setNewMovie({ ...newMovie, dateSeen: e.target.value })
-            }
+            onChange={(e) => setNewMovie({ ...newMovie, dateSeen: e.target.value })}
           />
         </div>
 
         <div className="modal-action flex gap-2">
           <button
-            className="btn btn-ghost text-gray-300 border-gray-600"
+            className="btn btn-ghost text-gray-300 border-gray-600 
+             transition-colors duration-500 
+             hover:text-gray-400 hover:border-gray-500"           
             onClick={onClose}
             aria-label="Cancelar"
             disabled={loadingSave}
