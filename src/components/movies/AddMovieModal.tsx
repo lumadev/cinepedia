@@ -6,6 +6,8 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { MultiSelectAutocomplete } from "@/components/ui/MultiSelectAutocomplete";
+import { movieGenres } from "@/components/movies/movieGenres";
 
 import type { Movie } from "@/components/movies/movie";
 
@@ -88,6 +90,18 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               setNewMovie({ ...newMovie, description: e.target.value })
             }
           />
+
+          <MultiSelectAutocomplete
+            options={movieGenres}
+            selected={newMovie.genres}
+            onChange={(genres) => setNewMovie({ ...newMovie, genres })}
+            placeholder="Adicionar gênero"
+          />
+
+          {/* Genres Helper */}
+          <p className="text-xs text-gray-500 mt-1">
+            Gêneros disponíveis: {movieGenres.join(", ")}
+          </p>
 
           <Input
             type="date"
