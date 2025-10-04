@@ -1,4 +1,4 @@
-import { Movie } from "@/components/movies/movie";
+import { Movie } from "@/components/movies/interfaces/movie";
 
 type MovieListProps = {
   movies: Movie[];

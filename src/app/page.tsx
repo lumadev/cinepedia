@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
-import { Movie } from "@/components/movies/movie";
+import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 
