@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/ToastContext";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -28,27 +28,44 @@ const emptyMovie: Omit<Movie, "id"> = {
 
 export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalProps) {
   const { showError } = useToast();
+
   const [newMovie, setNewMovie] = useState<Omit<Movie, "id">>(emptyMovie);
   const [loadingSave, setLoadingSave] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  
+  const inputBase = "w-full bg-gray-800 text-gray-100 border-gray-600 placeholder-gray-400 rounded-md";
+
+  // reset modal state when open modal
+  useEffect(() => {
+    if (isOpen) {
+      setNewMovie(emptyMovie);
+      setSubmitted(false);
+    }
+  }, [isOpen]);
 
   const updateMovie = (field: keyof Omit<Movie, "id">, value: any) => {
     setNewMovie((prev) => ({ ...prev, [field]: value }));
   };
+  
+  const errorsValidate = () => {
+    const errors: Record<string, string> = {};
+    if (!newMovie.title.trim()) errors.title = "O título é obrigatório";
+    if (!newMovie.poster.trim()) errors.poster = "O poster é obrigatório";
+    if (!newMovie.description.trim()) errors.description = "A descrição é obrigatória";
+    if (newMovie.genres.length === 0) errors.genres = "Selecione ao menos um gênero";
+    if (!newMovie.dateSeen) errors.dateSeen = "Informe a data que você viu o filme";
+    
+    return errors;
+  };
+  const errors = submitted ? errorsValidate() : {};
 
-  const handleSaveClick = () => {
+  const handleSave = () => {
     setSubmitted(true);
 
-    // validação simples
-    if (
-      !newMovie.title.trim() ||
-      !newMovie.poster.trim() ||
-      !newMovie.description.trim() ||
-      newMovie.genres.length === 0 ||
-      !newMovie.dateSeen
-    ) {
-      return;
-    }
+    const validationErrors = errorsValidate();
+    const hasErrors = Object.keys(validationErrors).length > 0
+    
+    if (hasErrors) return;
 
     saveMovie({
       movie: newMovie,
@@ -57,20 +74,18 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
       setMovie: setNewMovie,
       setLoading: setLoadingSave,
       showError,
-      emptyMovie
+      emptyMovie,
     });
   };
 
   if (!isOpen) return null;
 
-  const inputBase = "w-full bg-gray-800 text-gray-100 border-gray-600 placeholder-gray-400 rounded-md";
-
   return (
     <dialog className="modal modal-open">
       <div className="modal-box" style={{ 
-        backgroundColor: "rgba(40, 40, 40, 0.95)", 
-        color: "var(--foreground)" 
-      }}>
+          backgroundColor: "rgba(40, 40, 40, 0.95)", 
+          color: "var(--foreground)"
+        }}>
         <h3 className="font-bold text-lg">Novo Filme</h3>
 
         <div className="space-y-3 mt-4">
@@ -81,11 +96,9 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               aria-label="Título do filme"
               value={newMovie.title}
               onChange={(e) => updateMovie("title", e.target.value)}
-              required
               className={inputBase}
             />
-            {submitted && !newMovie.title 
-              && <FormError>O título é obrigatório</FormError>}
+            {errors.title && <FormError>{errors.title}</FormError>}
           </div>
 
           {/* Poster */}
@@ -95,11 +108,9 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               aria-label="Poster do filme"
               value={newMovie.poster}
               onChange={(e) => updateMovie("poster", e.target.value)}
-              required
               className={inputBase}
             />
-            {submitted && !newMovie.poster 
-              && <FormError>O poster é obrigatório</FormError>}
+            {errors.poster && <FormError>{errors.poster}</FormError>}
           </div>
 
           {/* Descrição */}
@@ -110,10 +121,8 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               className={`textarea textarea-bordered ${inputBase}`}
               value={newMovie.description}
               onChange={(e) => updateMovie("description", e.target.value)}
-              required
             />
-            {submitted && !newMovie.description 
-              && <FormError>A descrição é obrigatória</FormError>}
+            {errors.description && <FormError>{errors.description}</FormError>}
           </div>
 
           {/* Gêneros */}
@@ -124,7 +133,7 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               onChange={(genres) => updateMovie("genres", genres)}
               placeholder="Adicionar gênero"
             />
-            {submitted && newMovie.genres.length === 0 && <FormError>Selecione ao menos um gênero</FormError>}
+            {errors.genres && <FormError>{errors.genres}</FormError>}
             <p className="text-xs text-gray-500 mt-1">
               Gêneros disponíveis: {movieGenres.join(", ")}
             </p>
@@ -138,30 +147,18 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               label="Data que eu vi o filme"
               value={newMovie.dateSeen}
               onChange={(e) => updateMovie("dateSeen", e.target.value)}
-              required
               className={inputBase}
             />
-            {submitted && !newMovie.dateSeen 
-              && <FormError>Informe a data que você viu o filme</FormError>}
+            {errors.dateSeen && <FormError>{errors.dateSeen}</FormError>}
           </div>
         </div>
 
         <div className="modal-action flex gap-2">
-          <Button 
-            variant="ghost" 
-            onClick={onClose} 
-            disabled={loadingSave} 
-            aria-label="Cancelar"
-          >
+          <Button variant="ghost" onClick={onClose} disabled={loadingSave}>
             Cancelar
           </Button>
 
-          <Button 
-            variant="primary" 
-            onClick={handleSaveClick}
-            disabled={loadingSave} 
-            aria-label="Salvar filme"
-          >
+          <Button variant="primary" onClick={handleSave} disabled={loadingSave}>
             {loadingSave ? "Salvando..." : "Salvar"}
           </Button>
         </div>

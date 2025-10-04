@@ -16,11 +16,6 @@ interface SaveMovieParams {
 export async function saveMovie({ 
   movie, onAfterSave, onClose, setMovie, setLoading, showError, emptyMovie }: SaveMovieParams
 ) {
-  if (!movie.title.trim()) {
-    showError("O título é obrigatório");
-    return;
-  }
-
   setLoading(true);
   try {
     await addDoc(collection(db, "movies"), movie);
