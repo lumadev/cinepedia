@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/components/ui/ToastContext";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { LoginInput } from "./LoginInput";
 
 export const LoginForm = () => {
   const { showError } = useToast();
+
+  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,10 +22,16 @@ export const LoginForm = () => {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("Usuário logado:", userCredential.user);
-      
+
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+
+      document.cookie = `token=${token}; path=/; secure; samesite=strict`;
+
+      // redirect to home page
+      router.push("/");
     } catch (error: any) {
-      showError("Ocorreu um erro ao tentar logar");
+      showError("Credenciais inválidas");
     }
   };
 

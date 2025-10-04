@@ -25,6 +25,7 @@ export const LoginInput = ({
       value={value}
       onChange={onChange}
       required={required}
+      autoComplete="off"
     />
   );
 };
