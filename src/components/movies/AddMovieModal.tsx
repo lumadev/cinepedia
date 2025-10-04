@@ -51,7 +51,6 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
     const errors: Record<string, string> = {};
     if (!newMovie.title.trim()) errors.title = "O título é obrigatório";
     if (!newMovie.poster.trim()) errors.poster = "O poster é obrigatório";
-    if (!newMovie.description.trim()) errors.description = "A descrição é obrigatória";
     if (newMovie.genres.length === 0) errors.genres = "Selecione ao menos um gênero";
     if (!newMovie.dateSeen) errors.dateSeen = "Informe a data que você viu o filme";
     
@@ -64,7 +63,7 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
 
     const validationErrors = errorsValidate();
     const hasErrors = Object.keys(validationErrors).length > 0
-    
+
     if (hasErrors) return;
 
     saveMovie({
