@@ -16,30 +16,28 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const loadMovies = async () => {
+    setMovies([])
+
+    try {
+      const snapshot = await getDocs(collection(db, "movies"));
+      const moviesDatabase = snapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data() 
+      })) as Movie[];
+
+      setMovies(moviesDatabase);
+    } catch(e) {
+      setErrorMessage("Ocorreu um erro ao carregar os filmes.");
+    }
+  };
+
   useEffect(() => {
-    const loadMovies = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "movies"));
-        const moviesDatabase = snapshot.docs.map(doc => ({ 
-          id: Number(doc.id), 
-          ...doc.data() 
-        })) as Movie[];
-
-        setMovies(moviesDatabase);
-      } catch(e) {
-        setErrorMessage("Ocorreu um erro ao carregar os filmes.");
-      }
-    };
-
     loadMovies();
   }, []);
 
   const onAfterSave = (newMovie: Omit<Movie, "id">) => {
-    const movie: Movie = {
-      id: movies.length + 1,
-      ...newMovie,
-    };
-    setMovies([...movies, movie]);
+    loadMovies()
   };
 
   return (
@@ -59,7 +57,13 @@ export default function Home() {
         <LogoutButton />
       </div>
 
-      <MovieList movies={movies} />
+      <MovieList 
+        movies={movies}
+        onAfterDeleteAction={() => {
+          console.log('jdshdsjadashjsjdhk')
+          loadMovies()
+        }}
+      />
 
       <AddMovieModal
         isOpen={showModal}
