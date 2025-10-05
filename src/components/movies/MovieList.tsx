@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Movie } from "@/components/movies/interfaces/movie";
 import { IconTrash } from "@tabler/icons-react";
 import { useToast } from "@/components/ui/ToastContext";
+import { formatDate } from "@/utils/date"
 
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -57,6 +58,7 @@ export const MovieList = ({ movies, onAfterDeleteAction }: MovieListProps) => {
           <div className={`card-body p-3 transition-opacity duration-200 ${loadingId === movie.id ? "opacity-60" : ""}`}>
             <h2 className="card-title text-sm">{movie.title}</h2>
             <p className="text-xs text-gray-400">{movie.genres?.join(", ")}</p>
+            <p className="text-xs text-gray-400">{formatDate(movie.dateSeen)}</p>
           </div>
 
           {/* Loader circular centralizado */}

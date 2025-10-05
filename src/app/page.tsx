@@ -60,7 +60,6 @@ export default function Home() {
       <MovieList 
         movies={movies}
         onAfterDeleteAction={() => {
-          console.log('jdshdsjadashjsjdhk')
           loadMovies()
         }}
       />
