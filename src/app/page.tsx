@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
@@ -44,13 +45,18 @@ export default function Home() {
   return (
     <div className="min-h-screen p-6 bg-[var(--background)] text-[var(--foreground)] transition-colors">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Lista de Filmes</h1>
-        <Button
-          variant="primary"
-          onClick={() => setShowModal(true)}
-        >
-          Adicionar Filme
-        </Button>
+        <div className="flex items-center mb-6">
+          <h1 className="text-2xl font-bold">Lista de Filmes</h1>
+          <Button
+            className="ml-4"
+            variant="primary"
+            onClick={() => setShowModal(true)}
+          >
+            Adicionar Filme
+          </Button>
+        </div>
+        
+        <LogoutButton />
       </div>
 
       <MovieList movies={movies} />
