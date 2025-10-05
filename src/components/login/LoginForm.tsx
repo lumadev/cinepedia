@@ -16,11 +16,13 @@ export const LoginForm = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
       const user = userCredential.user;
@@ -32,6 +34,8 @@ export const LoginForm = () => {
       router.push("/");
     } catch (error: any) {
       showError("Credenciais inválidas");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,8 +60,8 @@ export const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <Button type="submit" className="w-full">
-            Login
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
       </div>
