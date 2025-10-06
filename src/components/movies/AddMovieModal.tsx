@@ -81,10 +81,21 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
 
   return (
     <dialog className="modal modal-open">
-      <div className="modal-box" style={{ 
-          backgroundColor: "rgba(40, 40, 40, 0.95)", 
-          color: "var(--foreground)"
-        }}>
+      <div
+        className="modal-box relative"
+        style={{
+          backgroundColor: "rgba(40, 40, 40, 0.95)",
+          color: "var(--foreground)",
+        }}
+      >
+        {/* Botão de fechar */}
+        <button
+          className="absolute top-2 mr-2 right-2 text-gray-400 hover:text-gray-200 hover:scale-110 transition-transform duration-200"
+          onClick={onClose}
+          aria-label="Fechar modal"
+        >
+          ✕
+        </button>
         <h3 className="font-bold text-lg">Novo Filme</h3>
 
         <div className="space-y-3 mt-4">
