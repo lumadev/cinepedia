@@ -8,7 +8,7 @@ import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function Home() {
@@ -20,7 +20,10 @@ export default function Home() {
     setMovies([])
 
     try {
-      const snapshot = await getDocs(collection(db, "movies"));
+      const moviesRef = collection(db, "movies");
+      const queryRes = query(moviesRef, orderBy("dateSeen", "desc"));
+      const snapshot = await getDocs(queryRes);
+
       const moviesDatabase = snapshot.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data() 
