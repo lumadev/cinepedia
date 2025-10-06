@@ -12,12 +12,23 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function Home() {
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<Record<number, Movie[]>>({});
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const groupByYear = (movies: Movie[]): Record<number, Movie[]> => {
+    return movies.reduce((acc, movie) => {
+      const year = new Date(movie.dateSeen).getFullYear();
+      if (!acc[year]) {
+        acc[year] = [];
+      }
+      acc[year].push(movie);
+      return acc;
+    }, {} as Record<number, Movie[]>);
+  };
+
   const loadMovies = async () => {
-    setMovies([])
+    setMovies({})
 
     try {
       const moviesRef = collection(db, "movies");
@@ -29,7 +40,9 @@ export default function Home() {
         ...doc.data() 
       })) as Movie[];
 
-      setMovies(moviesDatabase);
+      const moviesByYear = groupByYear(moviesDatabase);
+
+      setMovies(moviesByYear);
     } catch(e) {
       setErrorMessage("Ocorreu um erro ao carregar os filmes.");
     }
