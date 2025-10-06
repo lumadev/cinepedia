@@ -1,6 +1,5 @@
 import { addDoc, collection } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
+import { db, auth } from "@/lib/firebase";
 import type { Movie } from "@/components/movies/interfaces/movie";
 
 interface SaveMovieParams {
@@ -18,8 +17,15 @@ export async function saveMovie({
 ) {
   setLoading(true);
   try {
-    await addDoc(collection(db, "movies"), movie);
-    onAfterSave(movie);
+    const user = auth.currentUser;
+    const movieFormatted = {
+      ...movie,
+      userId: user.uid,
+    };
+
+    await addDoc(collection(db, "movies"), movieFormatted);
+
+    onAfterSave(movieFormatted);
     setMovie(emptyMovie);
     onClose();
   } catch (e) {
