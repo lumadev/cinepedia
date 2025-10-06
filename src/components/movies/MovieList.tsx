@@ -9,6 +9,8 @@ import { formatDate } from "@/utils/date"
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+import { DeleteMovieButton } from "./DeleteMovieButton";
+
 type MovieListProps = {
   movies: Movie[];
   onAfterDeleteAction: () => void;
@@ -70,13 +72,14 @@ export const MovieList = ({ movies, onAfterDeleteAction }: MovieListProps) => {
 
           {/* Ícones aparecem apenas no hover */}
           <div className="absolute top-3 right-3 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={() => handleDelete(movie.id)}
-              disabled={loadingId === movie.id}
-              className="p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/70 transition-colors shadow-md"
-            >
-              <IconTrash size={24} className="text-white" />
-            </button>
+            <DeleteMovieButton
+              movieId={movie.id}
+              onAfterDeleteAction={() => {
+                setLoadingId(movie.id);
+                onAfterDeleteAction();
+                setLoadingId(null);
+              }}
+            />
           </div>
         </div>
       ))}
