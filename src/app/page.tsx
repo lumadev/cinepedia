@@ -42,7 +42,7 @@ export default function Home() {
         // filtra os filmes do usuário logado
         const queryRes = query(
           moviesRef,
-          where("userId", "==", user.uid),
+          where("userId", "==", user?.uid),
           orderBy("dateSeen", "desc")
         );
         const snapshot = await getDocs(queryRes);
