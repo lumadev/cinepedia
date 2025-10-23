@@ -8,7 +8,8 @@ import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "@/lib/firebase";
 
 export default function Home() {
@@ -31,18 +32,30 @@ export default function Home() {
     setMovies({})
 
     try {
-      const moviesRef = collection(db, "movies");
-      const queryRes = query(moviesRef, orderBy("dateSeen", "desc"));
-      const snapshot = await getDocs(queryRes);
+      const auth = getAuth();
 
-      const moviesDatabase = snapshot.docs.map(doc => ({ 
-        id: doc.id, 
-        ...doc.data() 
-      })) as Movie[];
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return
 
-      const moviesByYear = groupByYear(moviesDatabase);
+        const moviesRef = collection(db, "movies");
 
-      setMovies(moviesByYear);
+        // filtra os filmes do usuário logado
+        const queryRes = query(
+          moviesRef,
+          where("userId", "==", user.uid),
+          orderBy("dateSeen", "desc")
+        );
+        const snapshot = await getDocs(queryRes);
+
+        const moviesDatabase = snapshot.docs.map(doc => ({ 
+          id: doc.id, 
+          ...doc.data() 
+        })) as Movie[];
+
+        const moviesByYear = groupByYear(moviesDatabase);
+
+        setMovies(moviesByYear);
+      })
     } catch(e) {
       setErrorMessage("Ocorreu um erro ao carregar os filmes.");
     }
