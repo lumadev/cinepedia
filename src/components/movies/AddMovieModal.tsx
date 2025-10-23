@@ -66,8 +66,16 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
 
     if (hasErrors) return;
 
+    const now = new Date();
+    const formattedDate = now.toISOString().slice(0, 16).replace('T', ' ');
+
+    const movieWithDate = {
+      ...newMovie,
+      dateRegister: formattedDate,
+    };
+
     saveMovie({
-      movie: newMovie,
+      movie: movieWithDate,
       onAfterSave,
       onClose,
       setMovie: setNewMovie,
