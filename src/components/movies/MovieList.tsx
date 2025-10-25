@@ -4,14 +4,21 @@ import { useState } from "react";
 import { Movie } from "@/components/movies/interfaces/movie";
 import { formatDate } from "@/utils/date"
 
+import { EditMovieButton } from "./EditMovieButton";
 import { DeleteMovieButton } from "./DeleteMovieButton";
 
 type MovieListProps = {
-  movies: Record<number, Movie[]>; // Alterado para agrupar por ano
+  movies: Record<number, Movie[]>;
   onAfterDeleteAction: () => void;
+  onEditMovieAction: (movie: Movie) => void;
 };
 
-export const MovieList = ({ movies, onAfterDeleteAction }: MovieListProps) => {
+export const MovieList = ({ 
+  movies, 
+  onAfterDeleteAction,
+  onEditMovieAction
+}: MovieListProps) => {
+
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   // Ordena os anos do mais recente para o mais antigo
@@ -56,6 +63,10 @@ export const MovieList = ({ movies, onAfterDeleteAction }: MovieListProps) => {
                 )}
 
                 <div className="absolute top-3 right-3 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <EditMovieButton
+                    movie={movie}
+                    onEditMovieAction={(m) => onEditMovieAction(m)}
+                  />
                   <DeleteMovieButton
                     movieId={movie.id}
                     onAfterDeleteAction={() => {

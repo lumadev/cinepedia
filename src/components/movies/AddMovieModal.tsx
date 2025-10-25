@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { MultiSelectAutocomplete } from "@/components/ui/MultiSelectAutocomplete";
 import { movieGenres } from "@/components/movies/constants/movieGenres";
 import { saveMovie } from "@/components/movies/helpers/saveMovie";
+import { updateMovie } from "@/components/movies/helpers/updateMovie"; // 👈 novo helper que você vai criar
 import { FormError } from "@/components/ui/FormError";
 
 import type { Movie } from "@/components/movies/interfaces/movie";
@@ -15,6 +16,8 @@ interface AddMovieModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAfterSave: () => void;
+  isEdit: boolean;
+  movie?: Movie;
 }
 
 const emptyMovie: Omit<Movie, "id"> = {
@@ -27,63 +30,88 @@ const emptyMovie: Omit<Movie, "id"> = {
   dateSeen: "",
 };
 
-export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalProps) {
-  const { showError } = useToast();
+export function AddMovieModal({
+  isOpen,
+  onClose,
+  onAfterSave,
+  isEdit = false,
+  movie,
+}: AddMovieModalProps) {
+  const { showError, showSuccess } = useToast();
 
   const [newMovie, setNewMovie] = useState<Omit<Movie, "id">>(emptyMovie);
   const [loadingSave, setLoadingSave] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  
-  const inputBase = "w-full bg-gray-800 text-gray-100 border-gray-600 placeholder-gray-400 rounded-md";
 
-  // reset modal state when open modal
+  const inputBase =
+    "w-full bg-gray-800 text-gray-100 border-gray-600 placeholder-gray-400 rounded-md";
+
   useEffect(() => {
-    if (isOpen) {
-      setNewMovie(emptyMovie);
-      setSubmitted(false);
-    }
-  }, [isOpen]);
+    if (!isOpen) return
 
-  const updateMovie = (field: keyof Omit<Movie, "id">, value: any) => {
+    if (isEdit && movie) {
+      const { id, ...rest } = movie;
+      setNewMovie(rest);
+    } else {
+      // Se for novo, limpa os dados
+      setNewMovie(emptyMovie);
+    }
+    setSubmitted(false);
+  }, [isOpen, isEdit, movie]);
+
+  const updateMovieField = (field: keyof Omit<Movie, "id">, value: any) => {
     setNewMovie((prev) => ({ ...prev, [field]: value }));
   };
-  
-  const errorsValidate = () => {
+
+  const validate = () => {
     const errors: Record<string, string> = {};
     if (!newMovie.title.trim()) errors.title = "O título é obrigatório";
     if (!newMovie.poster.trim()) errors.poster = "O poster é obrigatório";
     if (newMovie.genres.length === 0) errors.genres = "Selecione ao menos um gênero";
     if (!newMovie.dateSeen) errors.dateSeen = "Informe a data que você viu o filme";
-    
     return errors;
   };
-  const errors = submitted ? errorsValidate() : {};
+  const errors = submitted ? validate() : {};
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSubmitted(true);
 
-    const validationErrors = errorsValidate();
-    const hasErrors = Object.keys(validationErrors).length > 0
-
-    if (hasErrors) return;
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) return;
 
     const now = new Date();
-    const formattedDate = now.toISOString().slice(0, 16).replace('T', ' ');
+    const formattedDate = now.toISOString().slice(0, 16).replace("T", " ");
 
     const movieWithDate = {
       ...newMovie,
       dateRegister: formattedDate,
     };
 
-    saveMovie({
-      movie: movieWithDate,
-      onAfterSave,
-      onClose,
-      setMovie: setNewMovie,
-      setLoading: setLoadingSave,
-      showError,
-      emptyMovie,
-    });
+    try {
+      setLoadingSave(true);
+
+      if (isEdit && movie?.id) {
+        await updateMovie({
+          id: movie.id,
+          movie: movieWithDate,
+        });
+      } else {
+        await saveMovie({
+          movie: movieWithDate,
+          onClose,
+          setMovie: setNewMovie,
+          emptyMovie,
+        });
+      }
+      showSuccess("Filme salvo com sucesso!");
+
+      onAfterSave();
+      onClose();
+    } catch (error) {
+      showError("Erro ao salvar o filme.");
+    } finally {
+      setLoadingSave(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -105,7 +133,11 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
         >
           ✕
         </button>
-        <h3 className="font-bold text-lg">Novo Filme</h3>
+
+        {/* Título dinâmico */}
+        <h3 className="font-bold text-lg">
+          {isEdit ? "Editar Filme" : "Novo Filme"}
+        </h3>
 
         <div className="space-y-3 mt-4">
           {/* Título */}
@@ -114,7 +146,7 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               placeholder="Título"
               aria-label="Título do filme"
               value={newMovie.title}
-              onChange={(e) => updateMovie("title", e.target.value)}
+              onChange={(e) => updateMovieField("title", e.target.value)}
               className={inputBase}
             />
             {errors.title && <FormError>{errors.title}</FormError>}
@@ -125,8 +157,8 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
             <Input
               placeholder="Ordem"
               aria-label="Ordem do filme"
-              value={newMovie.order}
-              onChange={(e) => updateMovie("order", e.target.value)}
+              value={newMovie.order ?? ""}
+              onChange={(e) => updateMovieField("order", e.target.value)}
             />
           </div>
 
@@ -136,7 +168,7 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               placeholder="URL do Poster"
               aria-label="Poster do filme"
               value={newMovie.poster}
-              onChange={(e) => updateMovie("poster", e.target.value)}
+              onChange={(e) => updateMovieField("poster", e.target.value)}
               className={inputBase}
             />
             {errors.poster && <FormError>{errors.poster}</FormError>}
@@ -149,7 +181,7 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               aria-label="Descrição do filme"
               className={`textarea textarea-bordered ${inputBase}`}
               value={newMovie.description}
-              onChange={(e) => updateMovie("description", e.target.value)}
+              onChange={(e) => updateMovieField("description", e.target.value)}
             />
             {errors.description && <FormError>{errors.description}</FormError>}
           </div>
@@ -159,11 +191,10 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
             <MultiSelectAutocomplete
               options={movieGenres}
               selected={newMovie.genres}
-              onChange={(genres) => updateMovie("genres", genres)}
+              onChange={(genres) => updateMovieField("genres", genres)}
               placeholder="Adicionar gênero"
             />
             {errors.genres && <FormError>{errors.genres}</FormError>}
-
             <p className="text-xs text-gray-500 mt-1">
               Gêneros disponíveis: {movieGenres.join(", ")}
             </p>
@@ -176,7 +207,7 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               aria-label="Data em que o filme foi visto"
               label="Data que eu vi o filme"
               value={newMovie.dateSeen}
-              onChange={(e) => updateMovie("dateSeen", e.target.value)}
+              onChange={(e) => updateMovieField("dateSeen", e.target.value)}
               className={inputBase}
             />
             {errors.dateSeen && <FormError>{errors.dateSeen}</FormError>}

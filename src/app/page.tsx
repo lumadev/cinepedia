@@ -16,20 +16,21 @@ import { db } from "@/lib/firebase";
 export default function Home() {
   const [movies, setMovies] = useState<Record<number, Movie[]>>({});
   const [showModal, setShowModal] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const loadMovies = async () => {
-    setMovies({})
+    setMovies({});
 
     try {
       const auth = getAuth();
 
       onAuthStateChanged(auth, async (user) => {
-        if (!user) return
+        if (!user) return;
 
         const moviesRef = collection(db, "movies");
 
-        // filtra os filmes do usuário logado
         const queryRes = query(
           moviesRef,
           where("userId", "==", user?.uid),
@@ -37,16 +38,18 @@ export default function Home() {
         );
         const snapshot = await getDocs(queryRes);
 
-        const moviesDatabase = snapshot.docs.map(doc => ({ 
-          id: doc.id, 
-          ...doc.data() 
-        })) as Movie[];
+        const moviesDatabase = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            } as Movie)
+        );
 
         const moviesByYear = groupByYear(moviesDatabase);
-
         setMovies(moviesByYear);
-      })
-    } catch(e) {
+      });
+    } catch (e) {
       setErrorMessage("Ocorreu um erro ao carregar os filmes.");
     }
   };
@@ -56,7 +59,21 @@ export default function Home() {
   }, []);
 
   const onAfterSave = () => {
-    loadMovies()
+    loadMovies();
+    setIsEdit(false);
+    setMovieToEdit(null);
+  };
+
+  const handleAddMovie = () => {
+    setIsEdit(false);
+    setMovieToEdit(null);
+    setShowModal(true);
+  };
+
+  const handleEditMovie = (movie: Movie) => {
+    setIsEdit(true);
+    setMovieToEdit(movie);
+    setShowModal(true);
   };
 
   return (
@@ -64,29 +81,26 @@ export default function Home() {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center mb-6">
           <h1 className="text-2xl font-bold">Lista de Filmes</h1>
-          <Button
-            className="ml-4"
-            variant="primary"
-            onClick={() => setShowModal(true)}
-          >
+          <Button className="ml-4" variant="primary" onClick={handleAddMovie}>
             Adicionar Filme
           </Button>
         </div>
-        
+
         <LogoutButton />
       </div>
 
-      <MovieList 
+      <MovieList
         movies={movies}
-        onAfterDeleteAction={() => {
-          loadMovies()
-        }}
+        onAfterDeleteAction={loadMovies}
+        onEditMovieAction={handleEditMovie}
       />
 
       <AddMovieModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onAfterSave={onAfterSave}
+        isEdit={isEdit}
+        movie={movieToEdit}
       />
 
       {errorMessage && (

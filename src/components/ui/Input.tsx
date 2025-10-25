@@ -6,7 +6,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   className?: string;
-  value?: string | null;
+  value?: string | number | null;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -21,6 +21,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={combinedClass}
+          value={value ?? ""}
           {...props}
         />
         {error && <span className="text-red-500 text-sm">{error}</span>}
