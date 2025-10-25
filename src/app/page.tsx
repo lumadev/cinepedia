@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
+import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
 import { loadMovies } from "@/components/movies/helpers/loadMovies";
 
 export default function Home() {
@@ -15,10 +16,11 @@ export default function Home() {
   const [isEdit, setIsEdit] = useState(false);
   const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loadingMovies, setLoadingMovies] = useState(false); 
 
   const loadMoviesFn = () => {
-    loadMovies(setMovies, setErrorMessage);
-  }
+    loadMovies(setMovies, setErrorMessage, setLoadingMovies);
+  };
 
   useEffect(() => {
     loadMoviesFn()
@@ -55,11 +57,15 @@ export default function Home() {
         <LogoutButton />
       </div>
 
-      <MovieList
-        movies={movies}
-        onAfterDeleteAction={loadMoviesFn}
-        onEditMovieAction={handleEditMovie}
-      />
+      {loadingMovies ? (
+        <SkeletonLoader count={10} columns={5} />
+      ) : (
+        <MovieList
+          movies={movies}
+          onAfterDeleteAction={loadMoviesFn}
+          onEditMovieAction={handleEditMovie}
+        />
+      )}
 
       <AddMovieModal
         isOpen={showModal}
