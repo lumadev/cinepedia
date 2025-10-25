@@ -14,11 +14,12 @@ import type { Movie } from "@/components/movies/interfaces/movie";
 interface AddMovieModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAfterSave: (movie: Omit<Movie, "id">) => void;
+  onAfterSave: () => void;
 }
 
 const emptyMovie: Omit<Movie, "id"> = {
   title: "",
+  order: null,
   poster: "",
   genres: [],
   rating: null,
@@ -119,6 +120,16 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
             {errors.title && <FormError>{errors.title}</FormError>}
           </div>
 
+          {/* Ordem */}
+          <div>
+            <Input
+              placeholder="Ordem"
+              aria-label="Ordem do filme"
+              value={newMovie.order}
+              onChange={(e) => updateMovie("order", e.target.value)}
+            />
+          </div>
+
           {/* Poster */}
           <div>
             <Input
@@ -152,6 +163,7 @@ export function AddMovieModal({ isOpen, onClose, onAfterSave }: AddMovieModalPro
               placeholder="Adicionar gênero"
             />
             {errors.genres && <FormError>{errors.genres}</FormError>}
+
             <p className="text-xs text-gray-500 mt-1">
               Gêneros disponíveis: {movieGenres.join(", ")}
             </p>

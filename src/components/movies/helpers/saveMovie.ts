@@ -4,7 +4,7 @@ import type { Movie } from "@/components/movies/interfaces/movie";
 
 interface SaveMovieParams {
   movie: Omit<Movie, "id">;
-  onAfterSave: (movie: Omit<Movie, "id">) => void;
+  onAfterSave: () => void;
   onClose: () => void;
   setMovie: (movie: Omit<Movie, "id">) => void;
   setLoading: (loading: boolean) => void;
@@ -25,7 +25,7 @@ export async function saveMovie({
 
     await addDoc(collection(db, "movies"), movieFormatted);
 
-    onAfterSave(movieFormatted);
+    onAfterSave();
     setMovie(emptyMovie);
     onClose();
   } catch (e) {

@@ -1,5 +1,6 @@
 export interface Movie {
   id?: string;
+  order?: number;
   title: string;
   poster: string;
   genres?: string[];
