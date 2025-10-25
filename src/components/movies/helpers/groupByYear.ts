@@ -5,7 +5,8 @@ import type { Movie } from "@/components/movies/interfaces/movie";
  */
 export function groupByYear(movies: Movie[]): Record<number, Movie[]> {
   return movies.reduce((acc, movie) => {
-    const year = new Date(movie.dateSeen).getFullYear();
+    const year = new Date(movie.dateSeen + "T00:00:00").getFullYear();
+
     if (!acc[year]) {
       acc[year] = [];
     }
