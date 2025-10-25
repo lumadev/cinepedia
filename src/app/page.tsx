@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
+import { groupByYear } from "@/components/movies/helpers/groupByYear";
 
 import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -16,17 +17,6 @@ export default function Home() {
   const [movies, setMovies] = useState<Record<number, Movie[]>>({});
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const groupByYear = (movies: Movie[]): Record<number, Movie[]> => {
-    return movies.reduce((acc, movie) => {
-      const year = new Date(movie.dateSeen).getFullYear();
-      if (!acc[year]) {
-        acc[year] = [];
-      }
-      acc[year].push(movie);
-      return acc;
-    }, {} as Record<number, Movie[]>);
-  };
 
   const loadMovies = async () => {
     setMovies({})
@@ -65,7 +55,7 @@ export default function Home() {
     loadMovies();
   }, []);
 
-  const onAfterSave = (newMovie: Omit<Movie, "id">) => {
+  const onAfterSave = () => {
     loadMovies()
   };
 
