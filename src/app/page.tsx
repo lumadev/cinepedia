@@ -7,11 +7,7 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
-import { groupByYear } from "@/components/movies/helpers/groupByYear";
-
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { db } from "@/lib/firebase";
+import { loadMovies } from "@/components/movies/helpers/loadMovies";
 
 export default function Home() {
   const [movies, setMovies] = useState<Record<number, Movie[]>>({});
@@ -20,46 +16,16 @@ export default function Home() {
   const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const loadMovies = async () => {
-    setMovies({});
-
-    try {
-      const auth = getAuth();
-
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) return;
-
-        const moviesRef = collection(db, "movies");
-
-        const queryRes = query(
-          moviesRef,
-          where("userId", "==", user?.uid),
-          orderBy("dateSeen", "desc")
-        );
-        const snapshot = await getDocs(queryRes);
-
-        const moviesDatabase = snapshot.docs.map(
-          (doc) =>
-            ({
-              id: doc.id,
-              ...doc.data(),
-            } as Movie)
-        );
-
-        const moviesByYear = groupByYear(moviesDatabase);
-        setMovies(moviesByYear);
-      });
-    } catch (e) {
-      setErrorMessage("Ocorreu um erro ao carregar os filmes.");
-    }
-  };
+  const loadMoviesFn = () => {
+    loadMovies(setMovies, setErrorMessage);
+  }
 
   useEffect(() => {
-    loadMovies();
+    loadMoviesFn()
   }, []);
 
   const onAfterSave = () => {
-    loadMovies();
+    loadMoviesFn()
     setIsEdit(false);
     setMovieToEdit(null);
   };
@@ -91,7 +57,7 @@ export default function Home() {
 
       <MovieList
         movies={movies}
-        onAfterDeleteAction={loadMovies}
+        onAfterDeleteAction={loadMoviesFn}
         onEditMovieAction={handleEditMovie}
       />
 
