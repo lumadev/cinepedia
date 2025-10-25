@@ -8,18 +8,25 @@ import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
+
+import { loadLastOrder } from "@/components/movies/helpers/loadLastOrder";
 import { loadMovies } from "@/components/movies/helpers/loadMovies";
 
 export default function Home() {
   const [movies, setMovies] = useState<Record<number, Movie[]>>({});
+  const [lastOrder, setLastOrder] = useState(1);
+
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loadingMovies, setLoadingMovies] = useState(false); 
+
+  const [loadingMovies, setLoadingMovies] = useState(false);
+  const [loadingLastOrder, setLoadingLastOrder] = useState(false);
 
   const loadMoviesFn = () => {
     loadMovies(setMovies, setErrorMessage, setLoadingMovies);
+    loadLastOrder(setLastOrder, setErrorMessage, setLoadingLastOrder);
   };
 
   useEffect(() => {
@@ -57,23 +64,26 @@ export default function Home() {
         <LogoutButton />
       </div>
 
-      {loadingMovies ? (
+      {loadingMovies || loadingLastOrder ? (
         <SkeletonLoader count={10} />
       ) : (
-        <MovieList
-          movies={movies}
-          onAfterDeleteAction={loadMoviesFn}
-          onEditMovieAction={handleEditMovie}
-        />
-      )}
+        <>
+          <MovieList
+            movies={movies}
+            onAfterDeleteAction={loadMoviesFn}
+            onEditMovieAction={handleEditMovie}
+          />
 
-      <AddMovieModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onAfterSave={onAfterSave}
-        isEdit={isEdit}
-        movie={movieToEdit}
-      />
+          <AddMovieModal
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            onAfterSave={onAfterSave}
+            isEdit={isEdit}
+            movie={movieToEdit}
+            lastOrder={lastOrder}
+          />
+        </>
+      )}
 
       {errorMessage && (
         <Toast

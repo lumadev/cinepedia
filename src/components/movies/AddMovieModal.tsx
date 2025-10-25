@@ -18,6 +18,7 @@ interface AddMovieModalProps {
   onAfterSave: () => void;
   isEdit: boolean;
   movie?: Movie | null;
+  lastOrder: number
 }
 
 const emptyMovie: Omit<Movie, "id"> = {
@@ -36,6 +37,7 @@ export function AddMovieModal({
   onAfterSave,
   isEdit = false,
   movie,
+  lastOrder
 }: AddMovieModalProps) {
   const { showError, showSuccess } = useToast();
 
@@ -157,7 +159,8 @@ export function AddMovieModal({
             <Input
               placeholder="Ordem"
               aria-label="Ordem do filme"
-              value={newMovie.order ?? ""}
+              value={lastOrder}
+              disabled={true}
               onChange={(e) => updateMovieField("order", e.target.value)}
             />
           </div>
