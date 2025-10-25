@@ -4,10 +4,12 @@ import { db } from "@/lib/firebase";
 import { groupByYear } from "./groupByYear";
 import type { Movie } from "../interfaces/movie";
 
+type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
+
 export const loadMovies = (
-  setMovies: React.Dispatch<React.SetStateAction<Record<number, Movie[]>>>,
-  setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
-  setLoadingMovies: React.Dispatch<React.SetStateAction<boolean>>
+  setMovies: SetState<Record<number, Movie[]>>,
+  setErrorMessage: SetState<string | null>,
+  setLoadingMovies: SetState<boolean>
 ) => {
   setMovies({});
   setLoadingMovies(true);

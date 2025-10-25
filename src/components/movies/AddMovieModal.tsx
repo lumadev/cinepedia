@@ -17,7 +17,7 @@ interface AddMovieModalProps {
   onClose: () => void;
   onAfterSave: () => void;
   isEdit: boolean;
-  movie?: Movie;
+  movie?: Movie | null;
 }
 
 const emptyMovie: Omit<Movie, "id"> = {

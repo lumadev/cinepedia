@@ -7,7 +7,7 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 type DeleteMovieButtonProps = {
-  movieId: string;
+  movieId: string | null;
   onAfterDeleteAction: () => void;
 };
 
@@ -21,7 +21,7 @@ export const DeleteMovieButton = ({ movieId, onAfterDeleteAction }: DeleteMovieB
 
     try {
       setLoading(true);
-      await deleteDoc(doc(db, "movies", movieId));
+      movieId && await deleteDoc(doc(db, "movies", movieId));
 
       onAfterDeleteAction();
       showSuccess("Filme deletado com sucesso!");

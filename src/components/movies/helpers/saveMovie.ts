@@ -16,7 +16,7 @@ export async function saveMovie({
   const user = auth.currentUser;
   const movieFormatted = {
     ...movie,
-    userId: user.uid,
+    userId: user?.uid,
   };
 
   await addDoc(collection(db, "movies"), movieFormatted);
