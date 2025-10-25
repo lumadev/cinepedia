@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef} from "react";
 import { useToast } from "@/components/ui/ToastContext";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -48,18 +48,29 @@ export function AddMovieModal({
   const inputBase =
     "w-full bg-gray-800 text-gray-100 border-gray-600 placeholder-gray-400 rounded-md";
 
+  const getCalculatedOrder = () => {
+    if (isEdit && movie) {
+      return movie.order ? movie.order : (lastOrder ?? 0) + 1;
+    } else {
+      return lastOrder ? lastOrder + 1 : 1;
+    }
+  };
+
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
+
+    // só calcula uma vez ao abrir
+    const order = getCalculatedOrder();
 
     if (isEdit && movie) {
       const { id, ...rest } = movie;
-      setNewMovie(rest);
+      setNewMovie({ ...rest, order });
     } else {
-      // Se for novo, limpa os dados
-      setNewMovie(emptyMovie);
+      setNewMovie({ ...emptyMovie, order });
     }
+
     setSubmitted(false);
-  }, [isOpen, isEdit, movie]);
+  }, [isOpen]);
 
   const updateMovieField = (field: keyof Omit<Movie, "id">, value: any) => {
     setNewMovie((prev) => ({ ...prev, [field]: value }));
@@ -159,9 +170,8 @@ export function AddMovieModal({
             <Input
               placeholder="Ordem"
               aria-label="Ordem do filme"
-              value={lastOrder}
+              value={newMovie.order ?? ""}
               disabled={true}
-              onChange={(e) => updateMovieField("order", e.target.value)}
             />
           </div>
 

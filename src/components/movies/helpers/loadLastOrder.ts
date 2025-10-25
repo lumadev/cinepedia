@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export const loadLastOrder = (
-  setLastOrder: SetState<number>,
+  setLastOrder: SetState<number | null>,
   setErrorMessage: SetState<string | null>,
   setLoadingLastOrder: SetState<boolean>
 ) => {
@@ -15,7 +15,7 @@ export const loadLastOrder = (
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      setLastOrder(1);
+      setLastOrder(null);
       setLoadingLastOrder(false);
       return;
     }
@@ -31,7 +31,7 @@ export const loadLastOrder = (
 
       const snapshot = await getDocs(q);
       if (snapshot.empty) {
-        setLastOrder(1);
+        setLastOrder(null);
       } else {
         const lastMovie = snapshot.docs[0].data();
         const lastOrder = lastMovie.order ?? 0;
@@ -39,7 +39,7 @@ export const loadLastOrder = (
       }
     } catch {
       setErrorMessage("Ocorreu um erro ao buscar a última ordem.");
-      setLastOrder(1);
+      setLastOrder(null);
     } finally {
       setLoadingLastOrder(false);
     }
