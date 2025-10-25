@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Movie } from "@/components/movies/interfaces/movie";
 import { formatDate } from "@/utils/date"
 
-import { EditMovieButton } from "./EditMovieButton";
-import { DeleteMovieButton } from "./DeleteMovieButton";
+import { EditMovieButton } from "./buttons/EditMovieButton";
+import { DeleteMovieButton } from "./buttons/DeleteMovieButton";
 
 type MovieListProps = {
   movies: Record<number, Movie[]>;
