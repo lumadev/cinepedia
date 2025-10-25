@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { Movie } from "@/components/movies/interfaces/movie";
-import { useToast } from "@/components/ui/ToastContext";
 import { formatDate } from "@/utils/date"
-
-import { doc, deleteDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 import { DeleteMovieButton } from "./DeleteMovieButton";
 
@@ -17,20 +13,6 @@ type MovieListProps = {
 
 export const MovieList = ({ movies, onAfterDeleteAction }: MovieListProps) => {
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const { showError, showSuccess } = useToast();
-
-  const handleDelete = async (movieId: string) => {
-    try {
-      setLoadingId(movieId);
-      await deleteDoc(doc(db, "movies", movieId));
-      onAfterDeleteAction();
-      showSuccess("Filme deletado com sucesso!");
-    } catch (e) {
-      showError("Ocorreu um erro ao excluir o filme");
-    } finally {
-      setLoadingId(null);
-    }
-  };
 
   // Ordena os anos do mais recente para o mais antigo
   const sortedYears = Object.keys(movies)
