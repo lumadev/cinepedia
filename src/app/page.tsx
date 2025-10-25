@@ -58,7 +58,7 @@ export default function Home() {
       </div>
 
       {loadingMovies ? (
-        <SkeletonLoader count={10} columns={5} />
+        <SkeletonLoader count={10} />
       ) : (
         <MovieList
           movies={movies}
