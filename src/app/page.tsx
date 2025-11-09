@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
 import { LogoutButton } from "@/components/auth/LogoutButton";
@@ -8,12 +8,14 @@ import { Movie } from "@/components/movies/interfaces/movie";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
+import { SearchMovieBar } from "@/components/movies/SearchMovieBar";
 
 import { loadLastOrder } from "@/components/movies/helpers/loadLastOrder";
 import { loadMovies } from "@/components/movies/helpers/loadMovies";
 
 export default function Home() {
   const [movies, setMovies] = useState<Record<number, Movie[]>>({});
+  const [searchQuery, setSearchQuery] = useState("");
   const [lastOrder, setLastOrder] = useState(1);
 
   const [showModal, setShowModal] = useState(false);
@@ -24,20 +26,28 @@ export default function Home() {
   const [loadingMovies, setLoadingMovies] = useState(false);
   const [loadingLastOrder, setLoadingLastOrder] = useState(false);
 
-  const loadMoviesFn = () => {
+  const loadMoviesFn = useCallback(() => {
     loadMovies(setMovies, setErrorMessage, setLoadingMovies);
     loadLastOrder(setLastOrder, setErrorMessage, setLoadingLastOrder);
-  };
+  }, [])
 
-  useEffect(() => {
-    loadMoviesFn()
-  }, []);
+  const filteredMovies = useMemo(() => {
+    if (!searchQuery.trim()) return movies;
+    const lowerQuery = searchQuery.toLowerCase();
 
-  const onAfterSave = () => {
+    return Object.fromEntries(
+      Object.entries(movies).map(([order, movieArray]) => [
+        order,
+        movieArray.filter((m) => m.title.toLowerCase().includes(lowerQuery)),
+      ])
+    );
+  }, [movies, searchQuery]);
+
+  const onAfterSave = useCallback(() => {
     loadMoviesFn()
     setIsEdit(false);
     setMovieToEdit(null);
-  };
+  }, [loadMoviesFn])
 
   const handleAddMovie = () => {
     setIsEdit(false);
@@ -50,6 +60,10 @@ export default function Home() {
     setMovieToEdit(movie);
     setShowModal(true);
   };
+  
+  useEffect(() => {
+    loadMoviesFn()
+  }, []);
 
   return (
     <div className="min-h-screen p-6 bg-[var(--background)] text-[var(--foreground)] transition-colors">
@@ -61,7 +75,10 @@ export default function Home() {
           </Button>
         </div>
 
-        <LogoutButton />
+        <div className="flex items-center gap-4">
+          <SearchMovieBar onSearchChange={setSearchQuery} />
+          <LogoutButton />
+        </div>
       </div>
 
       {loadingMovies || loadingLastOrder ? (
@@ -69,7 +86,7 @@ export default function Home() {
       ) : (
         <>
           <MovieList
-            movies={movies}
+            movies={filteredMovies}
             onAfterDeleteAction={loadMoviesFn}
             onEditMovieAction={handleEditMovie}
           />

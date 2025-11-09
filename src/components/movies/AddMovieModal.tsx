@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { MultiSelectAutocomplete } from "@/components/ui/MultiSelectAutocomplete";
 import { movieGenres } from "@/components/movies/constants/movieGenres";
 import { saveMovie } from "@/components/movies/helpers/saveMovie";
-import { updateMovie } from "@/components/movies/helpers/updateMovie"; // 👈 novo helper que você vai criar
+import { updateMovie } from "@/components/movies/helpers/updateMovie";
 import { FormError } from "@/components/ui/FormError";
 
 import type { Movie } from "@/components/movies/interfaces/movie";
