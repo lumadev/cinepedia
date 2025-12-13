@@ -10,11 +10,12 @@ import { Toast } from "@/components/ui/Toast";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
 import { SearchMovieBar } from "@/components/movies/SearchMovieBar";
 
+import { useMovies } from "@/hooks/useMovies";
 import { loadLastOrder } from "@/components/movies/helpers/loadLastOrder";
-import { loadMovies } from "@/components/movies/helpers/loadMovies";
 
 export default function Home() {
-  const [movies, setMovies] = useState<Record<number, Movie[]>>({});
+  const { movies, loading: loadingMovies, error: errorLoadingMovies, fetchMovies } = useMovies();
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [lastOrder, setLastOrder] = useState(1);
 
@@ -22,14 +23,7 @@ export default function Home() {
   const [isEdit, setIsEdit] = useState(false);
   const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const [loadingMovies, setLoadingMovies] = useState(false);
   const [loadingLastOrder, setLoadingLastOrder] = useState(false);
-
-  const loadMoviesFn = useCallback(() => {
-    loadMovies(setMovies, setErrorMessage, setLoadingMovies);
-    loadLastOrder(setLastOrder, setErrorMessage, setLoadingLastOrder);
-  }, [])
 
   const filteredMovies = useMemo(() => {
     if (!searchQuery.trim()) return movies;
@@ -43,11 +37,22 @@ export default function Home() {
     );
   }, [movies, searchQuery]);
 
-  const onAfterSave = useCallback(() => {
-    loadMoviesFn()
+  const loadInitialData = () => {
+    loadLastOrder(setLastOrder, setErrorMessage, setLoadingLastOrder);
+  }
+
+  const onAfterDeleteAction = useCallback(() => {
+    fetchMovies()
+     // Atualiza a última ordem
+    loadInitialData();
+    setMovieToEdit(null);
+  }, [fetchMovies, loadInitialData]);
+
+  const onAfterSaveAction = useCallback(() => {
+    fetchMovies()
     setIsEdit(false);
     setMovieToEdit(null);
-  }, [loadMoviesFn])
+  }, [])
 
   const handleAddMovie = () => {
     setIsEdit(false);
@@ -62,8 +67,10 @@ export default function Home() {
   };
   
   useEffect(() => {
-    loadMoviesFn()
+    loadInitialData()
   }, []);
+
+  const displayError = errorLoadingMovies || errorMessage;
 
   return (
     <div className="min-h-screen p-6 bg-[var(--background)] text-[var(--foreground)] transition-colors">
@@ -87,14 +94,14 @@ export default function Home() {
         <>
           <MovieList
             movies={filteredMovies}
-            onAfterDeleteAction={loadMoviesFn}
+            onAfterDeleteAction={onAfterDeleteAction}
             onEditMovieAction={handleEditMovie}
           />
 
           <AddMovieModal
             isOpen={showModal}
             onClose={() => setShowModal(false)}
-            onAfterSave={onAfterSave}
+            onAfterSave={onAfterSaveAction}
             isEdit={isEdit}
             movie={movieToEdit}
             lastOrder={lastOrder}
@@ -102,9 +109,9 @@ export default function Home() {
         </>
       )}
 
-      {errorMessage && (
+      {displayError && (
         <Toast
-          message={errorMessage}
+          message={displayError}
           type="error"
           onClose={() => setErrorMessage(null)}
         />
