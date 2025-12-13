@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "start": "start http://localhost:3000",
     "build": "next build --turbopack",
-    "lint": "eslint"
+    "lint": "eslint",
+    "is": "pnpm install --ignore-scripts"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.35.0",
@@ -24,8 +25,8 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "daisyui": "^5.5.13",
-    "eslint": "^9.39.1",
-    "eslint-config-next": "16.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "16.0.10",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   }
