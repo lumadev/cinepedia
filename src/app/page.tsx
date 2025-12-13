@@ -3,12 +3,10 @@
 import { useState, useEffect, useCallback, useDeferredValue } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
-import { LogoutButton } from "@/components/auth/LogoutButton";
 import { Movie } from "@/components/movies/interfaces/movie";
-import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
-import { SearchMovieBar } from "@/components/movies/SearchMovieBar";
+import { MoviesNavbar } from "@/components/layout/MoviesNavbar";
 
 import { useMovies } from "@/hooks/useMovies";
 import { useFilteredMovies } from "@/hooks/useFilteredMovies";
@@ -68,49 +66,42 @@ export default function Home() {
   const displayError = errorLoadingMovies || errorMessage;
 
   return (
-    <div className="min-h-screen p-6 bg-[var(--background)] text-[var(--foreground)] transition-colors">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center mb-6">
-          <h1 className="text-2xl font-bold">Lista de Filmes</h1>
-          <Button className="ml-4" variant="primary" onClick={handleAddMovie}>
-            Adicionar Filme
-          </Button>
-        </div>
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] transition-colors">
+      <MoviesNavbar
+        onSearchChange={setSearchQuery}
+        onAddMovie={handleAddMovie}
+      />
 
-        <div className="flex items-center gap-4">
-          <SearchMovieBar onSearchChange={setSearchQuery} />
-          <LogoutButton />
-        </div>
+      <div className="p-6">
+        {loadingMovies || loadingLastOrder ? (
+          <SkeletonLoader count={10} />
+        ) : (
+          <>
+            <MovieList
+              movies={filteredMovies}
+              onAfterDeleteAction={onAfterDeleteAction}
+              onEditMovieAction={handleEditMovie}
+            />
+
+            <AddMovieModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onAfterSave={onAfterSaveAction}
+              isEdit={isEdit}
+              movie={movieToEdit}
+              lastOrder={lastOrder}
+            />
+          </>
+        )}
+
+        {displayError && (
+          <Toast
+            message={displayError}
+            type="error"
+            onClose={() => setErrorMessage(null)}
+          />
+        )}
       </div>
-
-      {loadingMovies || loadingLastOrder ? (
-        <SkeletonLoader count={10} />
-      ) : (
-        <>
-          <MovieList
-            movies={filteredMovies}
-            onAfterDeleteAction={onAfterDeleteAction}
-            onEditMovieAction={handleEditMovie}
-          />
-
-          <AddMovieModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onAfterSave={onAfterSaveAction}
-            isEdit={isEdit}
-            movie={movieToEdit}
-            lastOrder={lastOrder}
-          />
-        </>
-      )}
-
-      {displayError && (
-        <Toast
-          message={displayError}
-          type="error"
-          onClose={() => setErrorMessage(null)}
-        />
-      )}
     </div>
   );
 }
