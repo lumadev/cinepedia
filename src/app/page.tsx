@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useDeferredValue, useMemo } from "react";
+import { useState, useEffect, useCallback, useDeferredValue } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
 import { LogoutButton } from "@/components/auth/LogoutButton";
@@ -11,6 +11,8 @@ import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
 import { SearchMovieBar } from "@/components/movies/SearchMovieBar";
 
 import { useMovies } from "@/hooks/useMovies";
+import { useFilteredMovies } from "@/hooks/useFilteredMovies";
+
 import { loadLastOrder } from "@/components/movies/helpers/loadLastOrder";
 
 export default function Home() {
@@ -24,30 +26,12 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const deferredQuery = useDeferredValue(searchQuery);
+  const filteredMovies = useFilteredMovies(movies, searchQuery);
   
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
   
-  // robust search with deferredQuery
-  const filteredMovies = useMemo(() => {
-    if (!deferredQuery.trim()) return movies;
-
-    const lowerQuery = deferredQuery.toLowerCase();
-
-    const result: Record<string, Movie[]> = {};
-
-    Object.entries(movies).forEach(([order, movieArray]) => {
-      const filtered = movieArray.filter((m) => m.title.toLowerCase().includes(lowerQuery));
-      if (filtered.length > 0) {
-        result[order] = filtered;
-      }
-    });
-
-    return result;
-  }, [movies, deferredQuery]);
-
   const loadInitialData = useCallback(() => {
     loadLastOrder(setLastOrder, setErrorMessage, setLoadingLastOrder);
   }, []);
