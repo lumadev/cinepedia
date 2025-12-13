@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useDeferredValue, useMemo } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
 import { LogoutButton } from "@/components/auth/LogoutButton";
@@ -14,32 +14,43 @@ import { useMovies } from "@/hooks/useMovies";
 import { loadLastOrder } from "@/components/movies/helpers/loadLastOrder";
 
 export default function Home() {
+  // loading movies hook
   const { movies, loading: loadingMovies, error: errorLoadingMovies, fetchMovies } = useMovies();
   
-  const [searchQuery, setSearchQuery] = useState("");
-  const [lastOrder, setLastOrder] = useState(1);
-
-  const [showModal, setShowModal] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
-  const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loadingLastOrder, setLoadingLastOrder] = useState(false);
 
+  const [lastOrder, setLastOrder] = useState(1);
+  const [isEdit, setIsEdit] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const deferredQuery = useDeferredValue(searchQuery);
+  
+  // modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
+  
+  // robust search with deferredQuery
   const filteredMovies = useMemo(() => {
-    if (!searchQuery.trim()) return movies;
-    const lowerQuery = searchQuery.toLowerCase();
+    if (!deferredQuery.trim()) return movies;
 
-    return Object.fromEntries(
-      Object.entries(movies).map(([order, movieArray]) => [
-        order,
-        movieArray.filter((m) => m.title.toLowerCase().includes(lowerQuery)),
-      ])
-    );
-  }, [movies, searchQuery]);
+    const lowerQuery = deferredQuery.toLowerCase();
 
-  const loadInitialData = () => {
+    const result: Record<string, Movie[]> = {};
+
+    Object.entries(movies).forEach(([order, movieArray]) => {
+      const filtered = movieArray.filter((m) => m.title.toLowerCase().includes(lowerQuery));
+      if (filtered.length > 0) {
+        result[order] = filtered;
+      }
+    });
+
+    return result;
+  }, [movies, deferredQuery]);
+
+  const loadInitialData = useCallback(() => {
     loadLastOrder(setLastOrder, setErrorMessage, setLoadingLastOrder);
-  }
+  }, []);
 
   const onAfterDeleteAction = useCallback(() => {
     fetchMovies()
@@ -57,18 +68,18 @@ export default function Home() {
   const handleAddMovie = () => {
     setIsEdit(false);
     setMovieToEdit(null);
-    setShowModal(true);
+    setIsModalOpen(true);
   };
 
   const handleEditMovie = (movie: Movie) => {
     setIsEdit(true);
     setMovieToEdit(movie);
-    setShowModal(true);
+    setIsModalOpen(true);
   };
   
   useEffect(() => {
     loadInitialData()
-  }, []);
+  }, [loadInitialData]);
 
   const displayError = errorLoadingMovies || errorMessage;
 
@@ -99,8 +110,8 @@ export default function Home() {
           />
 
           <AddMovieModal
-            isOpen={showModal}
-            onClose={() => setShowModal(false)}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
             onAfterSave={onAfterSaveAction}
             isEdit={isEdit}
             movie={movieToEdit}
