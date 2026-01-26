@@ -9,12 +9,14 @@ import { DeleteMovieButton } from './buttons/DeleteMovieButton';
 
 type MovieListProps = {
   movies: Record<number, Movie[]>;
+  hasSearch: boolean;
   onAfterDeleteAction: () => void;
   onEditMovieAction: (movie: Movie) => void;
 };
 
 export const MovieList = ({
   movies,
+  hasSearch,
   onAfterDeleteAction,
   onEditMovieAction,
 }: MovieListProps) => {
@@ -33,16 +35,22 @@ export const MovieList = ({
     <div className="p-4 space-y-8">
       {!hasMovies && (
         <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="text-6xl mb-6">🎬</div>
+          {!hasSearch ? (
+            <>
+              <h2 className="text-2xl font-semibold text-white mb-2">
+                Ainda não há filmes por aqui
+              </h2>
 
-          <h2 className="text-2xl font-semibold text-white mb-2">
-            Ainda não há filmes por aqui
-          </h2>
-
-          <p className="text-gray-400 mb-6 max-w-md">
-            Sua lista está vazia no momento. Comece adicionando filmes que você já assistiu
-            ou quer assistir depois.
-          </p>
+              <p className="text-gray-400 mb-6 max-w-md">
+                Sua lista está vazia no momento. Comece adicionando filmes que você já assistiu
+                ou quer assistir depois.
+              </p>
+            </>
+          ) : (
+            <p className="text-gray-400 text-lg">
+              Nenhum filme encontrado para essa busca
+            </p>
+          )}
         </div>
       )}
 

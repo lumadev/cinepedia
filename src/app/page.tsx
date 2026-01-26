@@ -29,7 +29,7 @@ export default function Home() {
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
-  
+
   const loadInitialData = useCallback(() => {
     loadLastOrder(setLastOrder, setErrorMessage, setLoadingLastOrder);
   }, []);
@@ -64,6 +64,7 @@ export default function Home() {
   }, [loadInitialData]);
 
   const displayError = errorLoadingMovies || errorMessage;
+  const hasSearch = searchQuery.trim().length > 0;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] transition-colors">
@@ -79,6 +80,7 @@ export default function Home() {
           <>
             <MovieList
               movies={filteredMovies}
+              hasSearch={hasSearch}
               onAfterDeleteAction={onAfterDeleteAction}
               onEditMovieAction={handleEditMovie}
             />
