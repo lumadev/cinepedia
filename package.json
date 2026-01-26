@@ -10,21 +10,21 @@
     "is": "pnpm install --ignore-scripts"
   },
   "dependencies": {
-    "@tabler/icons-react": "^3.35.0",
+    "@tabler/icons-react": "^3.36.1",
     "clsx": "^2.1.1",
-    "firebase": "^12.6.0",
+    "firebase": "^12.8.0",
     "next": "16.0.10",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "use-debounce": "^10.0.6"
+    "use-debounce": "^10.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@tailwindcss/postcss": "^4.1.18",
-    "@types/node": "^25.0.1",
-    "@types/react": "^19.2.7",
+    "@types/node": "^25.0.10",
+    "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
-    "daisyui": "^5.5.13",
+    "daisyui": "^5.5.14",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.0.10",
     "tailwindcss": "^4.1.18",
