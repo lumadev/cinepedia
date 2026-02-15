@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
-/* DaisyUI como plugin do Tailwind */
-@plugin "daisyui";
+@plugin "daisyui" {
+  exclude: properties;
+}
 
 :root {
   --background: #0a0a0a;

@@ -1,51 +1,106 @@
 "use client";
 
+import { useState, useEffect, useCallback, useDeferredValue } from "react";
 import { MovieList } from "@/components/movies/MovieList";
 import { AddMovieModal } from "@/components/movies/AddMovieModal";
+import { Movie } from "@/components/movies/interfaces/movie";
 import { Toast } from "@/components/ui/Toast";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
 import { MoviesNavbar } from "@/components/layout/MoviesNavbar";
 
-import { useMoviesPageController } from "@/hooks/pages/useMoviesPageController";
+import { useMovies } from "@/hooks/useMovies";
+import { useFilteredMovies } from "@/hooks/useFilteredMovies";
+
+import { loadLastOrder } from "@/components/movies/helpers/loadLastOrder";
 
 export default function Home() {
-  const controller = useMoviesPageController();
+  // loading movies hook
+  const { movies, loading: loadingMovies, error: errorLoadingMovies, fetchMovies } = useMovies();
+  
+  const [loadingLastOrder, setLoadingLastOrder] = useState(false);
+
+  const [lastOrder, setLastOrder] = useState(1);
+  const [isEdit, setIsEdit] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredMovies = useFilteredMovies(movies, searchQuery);
+  
+  // modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [movieToEdit, setMovieToEdit] = useState<Movie | null>(null);
+
+  const loadInitialData = useCallback(() => {
+    loadLastOrder(setLastOrder, setErrorMessage, setLoadingLastOrder);
+  }, []);
+
+  const onAfterDeleteAction = useCallback(() => {
+    fetchMovies()
+     // Atualiza a última ordem
+    loadInitialData();
+    setMovieToEdit(null);
+  }, [fetchMovies, loadInitialData]);
+
+  const onAfterSaveAction = useCallback(() => {
+    fetchMovies()
+    setIsEdit(false);
+    setMovieToEdit(null);
+  }, [])
+
+  const handleAddMovie = () => {
+    setIsEdit(false);
+    setMovieToEdit(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditMovie = (movie: Movie) => {
+    setIsEdit(true);
+    setMovieToEdit(movie);
+    setIsModalOpen(true);
+  };
+  
+  useEffect(() => {
+    loadInitialData()
+  }, [loadInitialData]);
+
+  const displayError = errorLoadingMovies || errorMessage;
+  const hasSearch = searchQuery.trim().length > 0;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] transition-colors">
       <MoviesNavbar
-        onSearchChange={controller.setSearchQuery}
-        onAddMovie={controller.handleAddMovie}
+        onSearchChange={setSearchQuery}
+        onAddMovie={handleAddMovie}
       />
 
       <div className="p-6">
-        {controller.loading ? (
+        {loadingMovies || loadingLastOrder ? (
           <SkeletonLoader count={10} />
         ) : (
           <>
             <MovieList
-              movies={controller.filteredMovies}
-              hasSearch={controller.hasSearch}
-              onAfterDeleteAction={controller.onAfterDelete}
-              onEditMovieAction={controller.handleEditMovie}
+              movies={filteredMovies}
+              hasSearch={hasSearch}
+              onAfterDeleteAction={onAfterDeleteAction}
+              onEditMovieAction={handleEditMovie}
             />
 
             <AddMovieModal
-              isOpen={controller.isModalOpen}
-              onClose={() => controller.closeModal}
-              onAfterSave={controller.onAfterSave}
-              isEdit={controller.isEdit}
-              movie={controller.movieToEdit}
-              lastOrder={controller.lastOrder}
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onAfterSave={onAfterSaveAction}
+              isEdit={isEdit}
+              movie={movieToEdit}
+              lastOrder={lastOrder}
             />
           </>
         )}
 
-        {controller.displayError && (
+        {displayError && (
           <Toast
-            message={controller.displayError}
+            message={displayError}
             type="error"
-            onClose={controller.closeModal}
+            onClose={() => setErrorMessage(null)}
           />
         )}
       </div>
