@@ -6,7 +6,7 @@ type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export const loadLastOrder = (
   setLastOrder: SetState<number | null>,
-  setErrorMessage: SetState<string | null>,
+  setErrorLastOrder: SetState<string | null>,
   setLoadingLastOrder: SetState<boolean>
 ) => {
   setLoadingLastOrder(true);
@@ -38,7 +38,7 @@ export const loadLastOrder = (
         setLastOrder(lastOrder > 0 ? lastOrder : 1);
       }
     } catch {
-      setErrorMessage("Ocorreu um erro ao buscar a última ordem.");
+      setErrorLastOrder("Ocorreu um erro ao buscar a última ordem.");
       setLastOrder(null);
     } finally {
       setLoadingLastOrder(false);
