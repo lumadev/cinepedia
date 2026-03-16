@@ -30,7 +30,7 @@ export function MoviesNavbar({
       {/* Left side */}
       <div className="flex items-center gap-4">
         <h1 className="text-xl font-semibold tracking-tight">
-          Lista de Filmes
+          Cinepedia
         </h1>
 
         <Button variant="primary" onClick={onAddMovie}>
